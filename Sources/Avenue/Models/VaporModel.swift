@@ -16,7 +16,7 @@ public protocol VaporModel: PostgreSQLModel & Content & Parameter {
 }
 
 extension VaporModel {
-    var ownerID: [String]? {
+    public var ownerID: [String]? {
         get {
             return nil
         }
@@ -25,13 +25,13 @@ extension VaporModel {
         }
     }
     
-    mutating func assignOwner(_ owner: String) {
+    public mutating func assignOwner(_ owner: String) {
         var array = ownerID ?? Array<String>()
         array.append(owner)
         ownerID = array
     }
     
-    func update(_ model: Self) throws {
+    public func update(_ model: Self) throws {
         
     }
 }
