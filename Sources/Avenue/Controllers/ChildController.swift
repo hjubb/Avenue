@@ -2,11 +2,11 @@ import Foundation
 import FluentPostgreSQL
 import Vapor
 
-struct ChildController<Parent: VaporModel, Child: VaporModel> {
+public struct ChildController<Parent: VaporModel, Child: VaporModel> {
     var keypath: KeyPath<Child, Int>
     
     // MARK: Boot
-    func boot(router: Router) throws {
+    public func boot(router: Router) throws {
         print("🚀🚀🚀 Adding routes for Prent: \(Parent.name) and Child: \(Child.name)")
         let route = router.grouped(Parent.name.lowercased())
         route.put(Parent.parameter, "\(Child.name)", "add", use: addChild)

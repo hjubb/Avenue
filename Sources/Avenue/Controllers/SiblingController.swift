@@ -2,12 +2,12 @@ import Foundation
 import FluentPostgreSQL
 import Vapor
 
-struct SiblingController<LHS: VaporSibling, RHS: VaporModel, Pivot: VaporPivot> {
+public struct SiblingController<LHS: VaporSibling, RHS: VaporModel, Pivot: VaporPivot> {
     var keypathLeft: WritableKeyPath<Pivot, Int>
     var keypathRight: WritableKeyPath<Pivot, Int>
     
     // MARK: Boot
-    func boot(router: Router) throws {
+    public func boot(router: Router) throws {
         print("🚀🚀🚀 Adding routes for siblings LHS: \(LHS.name) and RHS: \(RHS.name)")
         let route = router.grouped(LHS.name.lowercased())
         route.post(LHS.parameter, "\(RHS.name)", RHS.parameter, "attach", use: add)

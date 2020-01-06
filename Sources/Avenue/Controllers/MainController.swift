@@ -2,9 +2,9 @@ import Foundation
 import FluentPostgreSQL
 import Vapor
 
-struct MainController<Model: VaporModel> {
+public struct MainController<Model: VaporModel> {
     // MARK: Boot
-    func boot(router: Router) throws {
+    public func boot(router: Router) throws {
         print("🚀🚀🚀 Adding routes for: \(Model.name)")
         let route = router.grouped(Model.name.lowercased())
         
