@@ -7,7 +7,7 @@ public struct SiblingController<LHS: VaporSibling, RHS: VaporModel, Pivot: Vapor
     var keypathRight: WritableKeyPath<Pivot, Int>
     
     // MARK: Boot
-    public init(router: Router, keypathLeft: WritableKeyPath<Pivot, Int>, keypathRight: WritableKeyPath<Pivot, Int>) throws {
+    public init(router: Router, keypathLeft: WritableKeyPath<Pivot, Int>, keypathRight: WritableKeyPath<Pivot, Int>) {
         self.keypathLeft = keypathLeft
         self.keypathRight = keypathRight
         print("🚀🚀🚀 Adding routes for siblings LHS: \(LHS.name) and RHS: \(RHS.name)")
