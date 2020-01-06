@@ -2,8 +2,8 @@ import Foundation
 import Vapor
 
 public struct Pagination: Content {
-    var offset: Int?
-    var length: Int?
+    public var offset: Int?
+    public var length: Int?
 }
 
 public var decoderJSON: JSONDecoder = {
