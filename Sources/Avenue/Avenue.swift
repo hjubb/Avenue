@@ -1,12 +1,12 @@
 import Foundation
 import Vapor
 
-struct Pagination: Content {
+public struct Pagination: Content {
     var offset: Int?
     var length: Int?
 }
 
-var decoderJSON: JSONDecoder = {
+public var decoderJSON: JSONDecoder = {
     let formatter = DateFormatter()
     formatter.calendar = Calendar(identifier: .iso8601)
     formatter.locale = Locale(identifier: "en_US_POSIX")
