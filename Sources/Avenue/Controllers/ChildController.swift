@@ -6,7 +6,8 @@ public struct ChildController<Parent: VaporModel, Child: VaporModel> {
     var keypath: KeyPath<Child, Int>
     
     // MARK: Boot
-    public func boot(router: Router) throws {
+    public init(router: Router, keypath: KeyPath<Child, Int>) {
+        self.keypath = keypath
         print("🚀🚀🚀 Adding routes for Prent: \(Parent.name) and Child: \(Child.name)")
         let route = router.grouped(Parent.name.lowercased())
         route.put(Parent.parameter, "\(Child.name)", "add", use: addChild)

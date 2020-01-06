@@ -7,13 +7,14 @@ public struct SiblingController<LHS: VaporSibling, RHS: VaporModel, Pivot: Vapor
     var keypathRight: WritableKeyPath<Pivot, Int>
     
     // MARK: Boot
-    public func boot(router: Router) throws {
+    public init(router: Router, keypathLeft: WritableKeyPath<Pivot, Int>, keypathRight: WritableKeyPath<Pivot, Int>) throws {
+        self.keypathLeft = keypathLeft
+        self.keypathRight = keypathRight
         print("🚀🚀🚀 Adding routes for siblings LHS: \(LHS.name) and RHS: \(RHS.name)")
         let route = router.grouped(LHS.name.lowercased())
         route.post(LHS.parameter, "\(RHS.name)", RHS.parameter, "attach", use: add)
         route.delete(LHS.parameter, "\(RHS.name)", RHS.parameter, "detach", use: remove)
         route.get(LHS.parameter, "siblings", "\(RHS.name)", use: getAllLHS)
-        
         let routeRHS = router.grouped(RHS.name.lowercased())
         routeRHS.get(RHS.parameter, "siblings", "\(LHS.name)", use: getAllRHS)
     }

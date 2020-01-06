@@ -4,10 +4,9 @@ import Vapor
 
 public struct MainController<Model: VaporModel> {
     // MARK: Boot
-    public func boot(router: Router) throws {
+    public init(router: Router) throws {
         print("🚀🚀🚀 Adding routes for: \(Model.name)")
         let route = router.grouped(Model.name.lowercased())
-        
         route.get(Model.parameter, use: getOneHandler)
         route.get(use: getAllHandler)
         route.get("owner", use: getAllByOwnerHandler)
