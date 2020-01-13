@@ -39,13 +39,13 @@ public func configure(_ config: inout Config, _ env: inout Environment, _ servic
     // Register routes to the router
     let router = EngineRouter.default()
     //CRUD routes
-    try MainController<Vendor>().boot(router: router)
+    _ = MainController<Vendor>(router: router)
     //Parent-Child relation routes
-    try ChildController<Vendor, Event>(keypath: \Event.vendorID).boot(router: router)
-    try ChildController<Vendor, Product>(keypath: \Product.vendorID).boot(router: router)
-    try ChildController<Vendor, List>(keypath: \List.vendorID).boot(router: router)
+    _ = ChildController<Vendor, Event>(router: router, keypath: \Event.vendorID)
+    _ = ChildController<Vendor, Product>(router: router, keypath: \Product.vendorID)
+    _ = ChildController<Vendor, List>(router: router, keypath: \List.vendorID)
     //Siblings routes
-    try SiblingController<List, Product, ListProduct>(keypathLeft: ListProduct.leftIDKey, keypathRight: ListProduct.rightIDKey).boot(router: router)
+    _ = SiblingController<List, Product, ListProduct>(router: router, keypathLeft: ListProduct.leftIDKey, keypathRight: ListProduct.rightIDKey)
     services.register(router, as: Router.self)
 
     // Register middleware

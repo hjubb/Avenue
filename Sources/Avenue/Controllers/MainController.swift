@@ -36,8 +36,10 @@ public struct MainController<Model: VaporModel> {
         let length = pagination.length ?? 50
         let endIndex = startIndex + length
         
+        let key: KeyPath = \Model.ownerID
+        
         return Model.query(on: req)
-            .filter(PostgreSQLColumnIdentifier.keyPath(\Model.ownerID), .contains, ownerId)
+            .filter(key, .contains, [ownerId])
             .range(startIndex ..< endIndex)
             .all()
     }
