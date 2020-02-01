@@ -8,6 +8,7 @@
 import Foundation
 import FluentPostgreSQL
 import Vapor
+@testable import Avenue
 
 final class ListProduct: VaporPivot {
     static let leftIDKey: LeftIDKey = \.listID

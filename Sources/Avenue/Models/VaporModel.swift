@@ -34,4 +34,26 @@ extension VaporModel {
     public func update(_ model: Self) throws {
         
     }
+    
+    static func applyQuery(_ req: Request, _ query: QueryBuilder<PostgreSQLDatabase, Self>) -> QueryBuilder<PostgreSQLDatabase, Self> {
+        var query = query
+        if let queryRequest = try? req.query.decode(Query.self) {
+            queryRequest.where?.forEach {
+                let op = PostgreSQLBinaryOperator(stringLiteral: $0.value.operator)
+                let tableIdentifierString = PostgreSQLTableIdentifier(stringLiteral: Self.sqlTableIdentifierString)
+                query = query.filter(PostgreSQLColumnIdentifier.column(tableIdentifierString, PostgreSQLIdentifier($0.value.key)), op, $0.value.value)
+            }
+            if let pagination = queryRequest.offset {
+                let startIndex = pagination.index ?? 0
+                let length = pagination.length ?? 50
+                let endIndex = startIndex + length
+                query = query.range(startIndex ..< endIndex)
+            }
+            if let order = queryRequest.order {
+                let tableIdentifierString = PostgreSQLTableIdentifier(stringLiteral: Self.sqlTableIdentifierString)
+                query = query.sort(PostgreSQLOrderBy.orderBy(.column(PostgreSQLColumnIdentifier.column(tableIdentifierString, PostgreSQLIdentifier(order.key))), order.descending ? .descending : .ascending))
+            }
+        }
+        return query
+    }
 }

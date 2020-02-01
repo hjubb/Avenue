@@ -1,9 +1,26 @@
 import Foundation
 import Vapor
 
-public struct Pagination: Content {
-    public var offset: Int?
+public struct Filter: Content {
+    var key: String
+    var value: AnyValue
+    var `operator`: String
+}
+
+public struct Offset: Content {
+    public var index: Int?
     public var length: Int?
+}
+
+public struct Order: Content {
+    var key: String
+    var descending: Bool
+}
+
+public struct Query: Content {
+    public var order: Order?
+    public var offset: Offset?
+    public var `where`: [Int : Filter]?
 }
 
 public var decoderJSON: JSONDecoder = {

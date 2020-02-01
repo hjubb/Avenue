@@ -41,24 +41,14 @@ public struct SiblingController<LHS: VaporSibling, RHS: VaporModel, Pivot: Vapor
     }
     
     func getAllLHS(_ req: Request) throws -> Future<[RHS]> {
-        let pagination = try req.query.decode(Pagination.self)
-        let startIndex = pagination.offset ?? 0
-        let length = pagination.length ?? 50
-        let endIndex = startIndex + length
-        
         return (try req.parameters.next(LHS.self) as! EventLoopFuture<LHS>).flatMap { lhs -> EventLoopFuture<[RHS]> in
-            return try lhs.siblings(related: RHS.self, through: Pivot.self, self.keypathLeft, self.keypathRight).query(on: req).range(startIndex ..< endIndex).all()
+            return RHS.applyQuery(req, try lhs.siblings(related: RHS.self, through: Pivot.self, self.keypathLeft, self.keypathRight).query(on: req)).all()
         }
     }
     
     func getAllRHS(_ req: Request) throws -> Future<[LHS]> {
-        let pagination = try req.query.decode(Pagination.self)
-        let startIndex = pagination.offset ?? 0
-        let length = pagination.length ?? 50
-        let endIndex = startIndex + length
-        
         return (try req.parameters.next(RHS.self) as! EventLoopFuture<RHS>).flatMap { rhs -> EventLoopFuture<[LHS]> in
-            return try rhs.siblings(related: LHS.self, through: Pivot.self, self.keypathRight, self.keypathLeft).query(on: req).range(startIndex ..< endIndex).all()
+            return LHS.applyQuery(req, try rhs.siblings(related: LHS.self, through: Pivot.self, self.keypathRight, self.keypathLeft).query(on: req)).all()
         }
     }
 }

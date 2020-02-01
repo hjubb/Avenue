@@ -42,13 +42,8 @@ public struct ChildController<Parent: VaporModel, Child: VaporModel> {
     }
     
     func getAllChildren(_ req: Request) throws -> Future<[Child]> {
-        let pagination = try req.query.decode(Pagination.self)
-        let startIndex = pagination.offset ?? 0
-        let length = pagination.length ?? 50
-        let endIndex = startIndex + length
-        
         return (try req.parameters.next(Parent.self) as! EventLoopFuture<Parent>).flatMap { parent -> EventLoopFuture<[Child]> in
-            return try parent.children(self.keypath).query(on: req).range(startIndex ..< endIndex).all()
+            return Child.applyQuery(req, try parent.children(self.keypath).query(on: req)).all()
         }
     }
     

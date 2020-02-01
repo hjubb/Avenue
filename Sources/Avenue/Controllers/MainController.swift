@@ -15,32 +15,21 @@ public struct MainController<Model: VaporModel> {
         route.delete(Model.parameter, use: deleteHandler)
     }
     
-    
     //MARK: Main
     func getOneHandler(_ req: Request) throws -> Future<Model> {
         return try req.parameters.next(Model.self) as! EventLoopFuture<Model>
     }
     
     func getAllHandler(_ req: Request) throws -> Future<[Model]> {
-        let pagination = try req.query.decode(Pagination.self)
-        let startIndex = pagination.offset ?? 0
-        let length = pagination.length ?? 50
-        let endIndex = startIndex + length
-        return Model.query(on: req).decode(Model.self).range(startIndex ..< endIndex).all()
+        return Model.applyQuery(req, Model.query(on: req)).decode(Model.self).all()
     }
     
     func getAllByOwnerHandler(_ req: Request) throws -> Future<[Model]> {
         guard let ownerId = req.http.headers.firstValue(name: .contentID) else { throw Abort(.badRequest) }
-        let pagination = try req.query.decode(Pagination.self)
-        let startIndex = pagination.offset ?? 0
-        let length = pagination.length ?? 50
-        let endIndex = startIndex + length
-        
         let key: KeyPath = \Model.ownerID
         
-        return Model.query(on: req)
-            .filter(key, .contains, [ownerId])
-            .range(startIndex ..< endIndex)
+        return Model.applyQuery(req, Model.query(on: req)
+            .filter(key, .contains, [ownerId]))
             .all()
     }
     

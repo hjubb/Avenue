@@ -5,8 +5,9 @@ import FluentPostgreSQL
 @testable import Avenue
 
 extension Event {
-    static func create(vendorID: Vendor.ID,on connection: PostgreSQLConnection) throws -> Event {
+    static func create(vendorID: Vendor.ID,on connection: PostgreSQLConnection, title: String? = nil) throws -> Event {
         let event = Event(vendorID: vendorID)
+        event.title = title
         return try event.save(on: connection).wait()
     }
 }
@@ -19,6 +20,7 @@ class ChildControllerTests: XCTestCase {
         ("testGetChild", testGetChild),
         ("testGetChildren", testGetChildren),
         ("testGetChildrenWithPagination", testGetChildrenWithPagination),
+        ("testGetChildrenWithFilters", testGetChildrenWithFilters),
     ]
     
     var app: Application!
@@ -91,7 +93,7 @@ class ChildControllerTests: XCTestCase {
     
     func testGetChildren() throws {
         let vendor = try Vendor.create(on: conn)
-        for _ in 0 ..< 100 {
+        for _ in 0 ..< 75 {
             _ = try Event.create(vendorID: try vendor.requireID(), on: conn)
         }
         
@@ -101,7 +103,7 @@ class ChildControllerTests: XCTestCase {
         XCTAssertEqual(response.http.status.code, 200)
         
         let fetch = try response.content.syncDecode([Event].self)
-        XCTAssert(fetch.count == 50)
+        XCTAssert(fetch.count == 75)
         XCTAssertNotNil(fetch)
     }
     
@@ -113,11 +115,30 @@ class ChildControllerTests: XCTestCase {
         
         var headers = HTTPHeaders()
         headers.replaceOrAdd(name: .contentID, value: "1234")
-        let response = try app.sendRequest(to: "\(Vendor.name.lowercased())/\(vendor.id!)/\(Event.name)/children?length=100", method: .GET, headers: headers)
+        let url = "\(Vendor.name.lowercased())/\(vendor.id!)/\(Event.name)/children?offset[length]=12&offset[index]=18"
+        let response = try app.sendRequest(to: url, method: .GET, headers: headers)
         XCTAssertEqual(response.http.status.code, 200)
         
         let fetch = try response.content.syncDecode([Event].self)
-        XCTAssert(fetch.count == 100)
+        XCTAssert(fetch.count == 12)
+        XCTAssertNotNil(fetch)
+    }
+    
+    func testGetChildrenWithFilters() throws {
+        let vendor = try Vendor.create(on: conn)
+        for i in 0 ..< 100 {
+            _ = try Event.create(vendorID: try vendor.requireID(), on: conn, title: i < 2 ? "Test Name" : nil)
+        }
+        
+        var headers = HTTPHeaders()
+        headers.replaceOrAdd(name: .contentID, value: "1234")
+        let url = "\(Vendor.name.lowercased())/\(vendor.id!)/\(Event.name)/children?where[1][key]=title&where[1][operator]==&where[1][value]=Test%20Name"
+
+        let response = try app.sendRequest(to: url, method: .GET, headers: headers)
+        XCTAssertEqual(response.http.status.code, 200)
+        
+        let fetch = try response.content.syncDecode([Event].self)
+        XCTAssert(fetch.count == 2)
         XCTAssertNotNil(fetch)
     }
 }

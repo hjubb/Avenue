@@ -1,6 +1,7 @@
 import Foundation
 import FluentPostgreSQL
 import Vapor
+@testable import Avenue
 
 final class Event: VaporModel {
     static var createdAtKey: TimestampKey? { return \.createdAt }

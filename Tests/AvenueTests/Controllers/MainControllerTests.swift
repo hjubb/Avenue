@@ -26,6 +26,7 @@ class MainControllerTests: XCTestCase {
         ("testGetAllVendor", testGetAllVendor),
         ("testGetAllOwnedVendor", testGetAllOwnedVendor),
         ("testCreateVendor", testCreateVendor),
+        ("testCreateVendorFromJSONString", testCreateVendorFromJSONString),
         ("testUpdateVendor", testUpdateVendor),
         ("testDeleteVendor", testDeleteVendor),
     ]
@@ -102,6 +103,25 @@ class MainControllerTests: XCTestCase {
         let fetch = try response.content.syncDecode(Vendor.self)
         XCTAssertTrue(fetch.ownerID?.contains("1234") == true)
         XCTAssertEqual(fetch.title, vendor.title)
+        XCTAssertNotNil(fetch)
+    }
+    
+    func testCreateVendorFromJSONString() throws {
+        struct VendorTest: Content {
+            var title: String
+            var description: String
+            var image: String
+        }
+        
+        var headers = HTTPHeaders()
+        headers.replaceOrAdd(name: .contentID, value: "1234")
+        let response = try app.sendRequest(to: "\(Vendor.name.lowercased())", method: .POST, headers: headers,
+                                           body: VendorTest(title: "First Event", description: "Newly created event", image: "https://www.image.com/image.jpg"))
+        XCTAssertEqual(response.http.status.code, 200)
+        
+        let fetch = try response.content.syncDecode(Vendor.self)
+        XCTAssertTrue(fetch.ownerID?.contains("1234") == true)
+        XCTAssertEqual(fetch.title, "First Event")
         XCTAssertNotNil(fetch)
     }
     

@@ -1,6 +1,7 @@
 import Foundation
 import FluentPostgreSQL
 import Vapor
+@testable import Avenue
 
 final class List: VaporSibling {
     static var createdAtKey: TimestampKey? { return \.createdAt }
